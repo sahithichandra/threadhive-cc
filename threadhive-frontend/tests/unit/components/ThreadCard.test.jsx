@@ -10,7 +10,7 @@ import threadReducer from "../../../src/reducers/threadSlice";
 import currentThreadReducer from "../../../src/reducers/selectedThreadSlice";
 import bookmarkReducer from "../../../src/reducers/bookmarkSlice";
 
-const createMockStore = (threads = [], savedIds = []) => {
+const createMockStore = (threads = [], savedThreads = []) => {
   return configureStore({
     reducer: {
       threads: threadReducer,
@@ -20,7 +20,7 @@ const createMockStore = (threads = [], savedIds = []) => {
     preloadedState: {
       threads: { threads, loading: false, error: null },
       currentThread: { thread: null, loading: false, error: null },
-      bookmarks: { savedThreads: [], savedIds, loading: false, error: null },
+      bookmarks: { savedThreads, loading: false, error: null },
     },
   });
 };
@@ -147,8 +147,8 @@ describe("ThreadCard Component", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows a saved (Unsave) bookmark button when the thread is in savedIds", () => {
-    const store = createMockStore([mockThread], [mockThread._id]);
+  it("shows a saved (Unsave) bookmark button when the thread is already saved", () => {
+    const store = createMockStore([mockThread], [mockThread]);
     render(
       <Provider store={store}>
         <BrowserRouter>

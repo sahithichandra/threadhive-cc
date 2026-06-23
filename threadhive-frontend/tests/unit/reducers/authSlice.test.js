@@ -7,6 +7,7 @@ import authReducer, {
   clearAuthState,
   setUser,
 } from '../../../src/reducers/authSlice';
+import bookmarkReducer, { fetchBookmarksThunk } from '../../../src/reducers/bookmarkSlice';
 import * as authService from '../../../src/services/authService';
 
 // Mock the auth service
@@ -67,6 +68,20 @@ describe('authSlice', () => {
       });
       expect(localStorage.getItem('token')).toBeNull();
       expect(localStorage.getItem('user')).toBeNull();
+    });
+  });
+
+  describe('logout clears bookmarks', () => {
+    it('resets the bookmarks slice so saved data cannot leak into the next session', () => {
+      const s = configureStore({
+        reducer: { auth: authReducer, bookmarks: bookmarkReducer },
+      });
+      s.dispatch(fetchBookmarksThunk.fulfilled([{ _id: 't1', title: 'X' }], ''));
+      expect(s.getState().bookmarks.savedThreads).toHaveLength(1);
+
+      s.dispatch(logout());
+
+      expect(s.getState().bookmarks.savedThreads).toHaveLength(0);
     });
   });
 

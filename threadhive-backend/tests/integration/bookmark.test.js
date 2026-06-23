@@ -156,6 +156,12 @@ describe("Bookmarks API", () => {
       .set("Authorization", `Bearer ${userA.token}`);
     expect(invalid.status).toBe(400);
 
+    // A 12-char non-hex string passes mongoose's loose isValid but must be rejected.
+    const twelveChars = await request(app)
+      .post("/api/bookmarks/threadIDxyz1")
+      .set("Authorization", `Bearer ${userA.token}`);
+    expect(twelveChars.status).toBe(400);
+
     const missing = await request(app)
       .post(`/api/bookmarks/${FAKE_ID}`)
       .set("Authorization", `Bearer ${userA.token}`);

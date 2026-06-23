@@ -2,10 +2,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { saveThreadThunk, unsaveThreadThunk } from '../../reducers/bookmarkSlice';
 
-export default function SaveButton({ threadId, size = 'sm' }) {
+export default function SaveButton({ thread, size = 'sm' }) {
   const dispatch = useDispatch();
+  const threadId = thread?._id;
   const isSaved = useSelector(
-    (state) => state.bookmarks?.savedIds?.includes(threadId) ?? false
+    (state) =>
+      state.bookmarks?.savedThreads?.some((t) => t._id === threadId) ?? false
   );
 
   const handleToggle = (e) => {
@@ -15,7 +17,7 @@ export default function SaveButton({ threadId, size = 'sm' }) {
     if (isSaved) {
       dispatch(unsaveThreadThunk(threadId));
     } else {
-      dispatch(saveThreadThunk(threadId));
+      dispatch(saveThreadThunk(thread));
     }
   };
 

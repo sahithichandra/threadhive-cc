@@ -11,6 +11,7 @@ import {
   clearComments,
 } from '../../reducers/commentSlice.js';
 import { rephraseTextThunk } from '../../reducers/threadSlice.js';
+import { fetchBookmarksThunk } from '../../reducers/bookmarkSlice.js';
 
 import ThreadCard from '../../components/ThreadList/ThreadCard.jsx';
 import CommentForm from '../../components/Comment/CommentForm.jsx';
@@ -38,6 +39,8 @@ export default function Thread() {
     if (threadId) {
       dispatch(fetchThreadById(threadId));
       dispatch(fetchComments(threadId));
+      // Hydrate saved state so a deep-linked thread shows the correct bookmark icon.
+      dispatch(fetchBookmarksThunk());
     }
 
     return () => {

@@ -14,14 +14,14 @@ export const fetchBookmarks = async () => {
 };
 
 export const saveThread = async (threadId) => {
-  const res = await axiosInstance.post(BOOKMARK_API.SAVE(threadId), null, {
+  const res = await axiosInstance.post(BOOKMARK_API.BY_ID(threadId), null, {
     headers: getAuthHeaders(),
   });
   return res.data.data;
 };
 
 export const unsaveThread = async (threadId) => {
-  const res = await axiosInstance.delete(BOOKMARK_API.UNSAVE(threadId), {
+  const res = await axiosInstance.delete(BOOKMARK_API.BY_ID(threadId), {
     headers: getAuthHeaders(),
   });
   return res.data.data;

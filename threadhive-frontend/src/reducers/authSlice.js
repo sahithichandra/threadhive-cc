@@ -1,6 +1,7 @@
 // features/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { login, register } from '../services/authService.js';
+import { clearBookmarks } from './bookmarkSlice.js';
 
 const initialState = {
   token: localStorage.getItem('token') || null,
@@ -44,6 +45,8 @@ export const logout = () => (dispatch) => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   dispatch(authSlice.actions.logout());
+  // Clear user-specific bookmark state so it can't leak into the next session.
+  dispatch(clearBookmarks());
 };
 
 // Thunk: update user locally — persists to localStorage then updates Redux state

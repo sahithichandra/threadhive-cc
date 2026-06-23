@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import {
   createBookmark,
   removeBookmark,
@@ -6,8 +5,10 @@ import {
 } from "../services/bookmarkService.js";
 import { createAppError } from "../utils/createAppError.js";
 
+// mongoose.Types.ObjectId.isValid() also accepts any 12-character string, which
+// would let a malformed id fall through to a 404. Require a real 24-char hex id.
 const assertValidThreadId = (threadId) => {
-  if (!mongoose.Types.ObjectId.isValid(threadId)) {
+  if (typeof threadId !== "string" || !/^[a-f\d]{24}$/i.test(threadId)) {
     throw createAppError("Invalid thread id", 400);
   }
 };

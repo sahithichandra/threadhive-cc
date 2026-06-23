@@ -59,7 +59,7 @@ export default function ThreadCard({ thread, goBack }) {
                 onUpvote={handleUpvote}
                 onDownvote={handleDownvote}
               />
-              <SaveButton threadId={thread._id} />
+              <SaveButton thread={thread} />
             </Stack>
           </Col>
 
