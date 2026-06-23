@@ -5,10 +5,10 @@ import bookmarkReducer, {
   unsaveThreadThunk,
   clearBookmarks,
 } from "../../../src/reducers/bookmarkSlice";
+import { upvoteThreadThunk, downvoteThreadThunk } from "../../../src/reducers/threadSlice";
 
 const initialState = {
   savedThreads: [],
-  savedIds: [],
   loading: false,
   error: null,
 };
@@ -25,7 +25,7 @@ describe("bookmarkSlice", () => {
       expect(state.error).toBeNull();
     });
 
-    it("stores savedThreads and derives savedIds on fulfilled", () => {
+    it("stores savedThreads on fulfilled", () => {
       const threads = [{ _id: "t1" }, { _id: "t2" }];
       const state = bookmarkReducer(
         initialState,
@@ -33,7 +33,14 @@ describe("bookmarkSlice", () => {
       );
       expect(state.loading).toBe(false);
       expect(state.savedThreads).toEqual(threads);
-      expect(state.savedIds).toEqual(["t1", "t2"]);
+    });
+
+    it("guards against a non-array payload on fulfilled", () => {
+      const state = bookmarkReducer(
+        initialState,
+        fetchBookmarksThunk.fulfilled(null, ""),
+      );
+      expect(state.savedThreads).toEqual([]);
     });
 
     it("sets error on rejected", () => {
@@ -47,29 +54,38 @@ describe("bookmarkSlice", () => {
   });
 
   describe("saveThreadThunk", () => {
-    it("adds the thread id on fulfilled", () => {
+    it("adds the thread to savedThreads on fulfilled", () => {
+      const thread = { _id: "t1", title: "Saved" };
       const state = bookmarkReducer(
         initialState,
-        saveThreadThunk.fulfilled("t1", "", "t1"),
+        saveThreadThunk.fulfilled(thread, "", thread),
       );
-      expect(state.savedIds).toContain("t1");
+      expect(state.savedThreads).toEqual([thread]);
     });
 
-    it("does not duplicate an already-saved id", () => {
-      const previousState = { ...initialState, savedIds: ["t1"] };
+    it("does not duplicate an already-saved thread", () => {
+      const thread = { _id: "t1", title: "Saved" };
+      const previousState = { ...initialState, savedThreads: [thread] };
       const state = bookmarkReducer(
         previousState,
-        saveThreadThunk.fulfilled("t1", "", "t1"),
+        saveThreadThunk.fulfilled(thread, "", thread),
       );
-      expect(state.savedIds).toEqual(["t1"]);
+      expect(state.savedThreads).toHaveLength(1);
+    });
+
+    it("sets error on rejected", () => {
+      const state = bookmarkReducer(
+        initialState,
+        saveThreadThunk.rejected(null, "", {}, "save failed"),
+      );
+      expect(state.error).toBe("save failed");
     });
   });
 
   describe("unsaveThreadThunk", () => {
-    it("removes the id and the thread on fulfilled", () => {
+    it("removes the thread on fulfilled", () => {
       const previousState = {
         savedThreads: [{ _id: "t1" }, { _id: "t2" }],
-        savedIds: ["t1", "t2"],
         loading: false,
         error: null,
       };
@@ -77,15 +93,51 @@ describe("bookmarkSlice", () => {
         previousState,
         unsaveThreadThunk.fulfilled("t1", "", "t1"),
       );
-      expect(state.savedIds).toEqual(["t2"]);
       expect(state.savedThreads).toEqual([{ _id: "t2" }]);
+    });
+
+    it("sets error on rejected", () => {
+      const state = bookmarkReducer(
+        initialState,
+        unsaveThreadThunk.rejected(null, "", "t1", "unsave failed"),
+      );
+      expect(state.error).toBe("unsave failed");
+    });
+  });
+
+  describe("vote sync", () => {
+    it("updates a saved thread's vote count when it is upvoted", () => {
+      const previousState = {
+        savedThreads: [{ _id: "t1", voteCount: 5 }],
+        loading: false,
+        error: null,
+      };
+      const updated = { _id: "t1", voteCount: 6 };
+      const state = bookmarkReducer(
+        previousState,
+        upvoteThreadThunk.fulfilled(updated, "", "t1"),
+      );
+      expect(state.savedThreads[0].voteCount).toBe(6);
+    });
+
+    it("ignores a vote for a thread that isn't saved", () => {
+      const previousState = {
+        savedThreads: [{ _id: "t1", voteCount: 5 }],
+        loading: false,
+        error: null,
+      };
+      const updated = { _id: "other", voteCount: 99 };
+      const state = bookmarkReducer(
+        previousState,
+        downvoteThreadThunk.fulfilled(updated, "", "other"),
+      );
+      expect(state.savedThreads[0].voteCount).toBe(5);
     });
   });
 
   it("clearBookmarks resets to the initial state", () => {
     const previousState = {
       savedThreads: [{ _id: "t1" }],
-      savedIds: ["t1"],
       loading: false,
       error: null,
     };

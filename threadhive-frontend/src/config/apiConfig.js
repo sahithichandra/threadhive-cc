@@ -29,8 +29,8 @@ export const COMMENT_API = {
 // Bookmark API Endpoints
 export const BOOKMARK_API = {
   GET_ALL: "/bookmarks",
-  SAVE: (threadId) => `/bookmarks/${threadId}`,
-  UNSAVE: (threadId) => `/bookmarks/${threadId}`,
+  // Same path for save (POST) and unsave (DELETE); the verb is chosen at the call site.
+  BY_ID: (threadId) => `/bookmarks/${threadId}`,
 };
 
 // Subreddit API Endpoints

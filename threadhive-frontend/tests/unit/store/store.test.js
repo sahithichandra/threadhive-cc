@@ -70,10 +70,8 @@ describe("Redux Store Configuration", () => {
     const state = store.getState();
 
     expect(state.bookmarks).toHaveProperty("savedThreads");
-    expect(state.bookmarks).toHaveProperty("savedIds");
     expect(state.bookmarks).toHaveProperty("loading");
     expect(state.bookmarks).toHaveProperty("error");
     expect(Array.isArray(state.bookmarks.savedThreads)).toBe(true);
-    expect(Array.isArray(state.bookmarks.savedIds)).toBe(true);
   });
 });

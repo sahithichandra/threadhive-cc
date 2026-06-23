@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
@@ -8,6 +9,10 @@ import ThreadPage from "../../../src/pages/User/ThreadPage";
 import threadReducer from "../../../src/reducers/threadSlice";
 import currentThreadReducer from "../../../src/reducers/selectedThreadSlice";
 import commentReducer from "../../../src/reducers/commentSlice";
+import bookmarkReducer from "../../../src/reducers/bookmarkSlice";
+import { server } from "../../mocks/server";
+
+const BASE_URL = "http://localhost:3000/api";
 
 const localStorageMock = {
   getItem: vi.fn().mockReturnValue(null),
@@ -26,6 +31,7 @@ const createTestStore = () => {
       threads: threadReducer,
       selectedThread: currentThreadReducer,
       comments: commentReducer,
+      bookmarks: bookmarkReducer,
     },
   });
 };
@@ -136,6 +142,34 @@ describe("Thread Component", () => {
     await waitFor(() => {
       expect(screen.getByText(/thread not found/i)).toBeInTheDocument();
     });
+  });
+
+  it("shows the thread as already saved on a deep link when it is bookmarked", async () => {
+    // Regression: deep-linking /thread/:id must hydrate saved state (was always 'Save').
+    server.use(
+      http.get(`${BASE_URL}/bookmarks`, () =>
+        HttpResponse.json({
+          data: [
+            {
+              _id: "thread-1",
+              title: "Getting Started with React",
+              content: "How do I start learning React?",
+              subreddit: { _id: "s1", name: "react" },
+              author: { _id: "u1", name: "John Doe" },
+              voteCount: 15,
+            },
+          ],
+        })
+      )
+    );
+
+    renderThreadPage("thread-1");
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /unsave thread/i })
+      ).toBeInTheDocument()
+    );
   });
 
   describe("AI features", () => {

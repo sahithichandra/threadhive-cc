@@ -38,7 +38,7 @@ export default function ThreadList({ threadsToDisplay }) {
                 <span className="subreddit-badge">
                   r/{thread.subreddit?.name || 'unknown'}
                 </span>
-                <SaveButton threadId={thread._id} />
+                <SaveButton thread={thread} />
               </div>
               <p className="thread-text">{thread.content}</p>
               <Link
