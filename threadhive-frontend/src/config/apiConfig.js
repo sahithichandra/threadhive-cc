@@ -33,6 +33,11 @@ export const BOOKMARK_API = {
   BY_ID: (threadId) => `/bookmarks/${threadId}`,
 };
 
+// Search API Endpoints
+export const SEARCH_API = {
+  THREADS: (q) => `/search/threads?q=${encodeURIComponent(q)}`,
+};
+
 // Subreddit API Endpoints
 export const SUBREDDIT_API = {
   GET_ALL: "/subreddits",

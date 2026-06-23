@@ -12,6 +12,7 @@ describe("Redux Store Configuration", () => {
     expect(state).toHaveProperty("theme");
     expect(state).toHaveProperty("subreddits");
     expect(state).toHaveProperty("bookmarks");
+    expect(state).toHaveProperty("search");
   });
 
   it("should initialize auth state correctly", () => {
@@ -73,5 +74,15 @@ describe("Redux Store Configuration", () => {
     expect(state.bookmarks).toHaveProperty("loading");
     expect(state.bookmarks).toHaveProperty("error");
     expect(Array.isArray(state.bookmarks.savedThreads)).toBe(true);
+  });
+
+  it("should initialize search state correctly", () => {
+    const state = store.getState();
+
+    expect(state.search).toHaveProperty("results");
+    expect(state.search).toHaveProperty("query");
+    expect(state.search).toHaveProperty("loading");
+    expect(state.search).toHaveProperty("error");
+    expect(Array.isArray(state.search.results)).toBe(true);
   });
 });

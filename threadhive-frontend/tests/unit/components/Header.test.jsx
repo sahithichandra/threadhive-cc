@@ -81,6 +81,30 @@ describe('Header Component', () => {
     expect(screen.getByLabelText(/toggle dark mode/i)).toHaveTextContent('\u2600');
   });
 
+  it('does not render the search bar when not authenticated', () => {
+    renderHeader();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+  });
+
+  it('renders the search bar when authenticated', () => {
+    renderHeader({ token: 'test-token', user: { name: 'Alice' } });
+    expect(screen.getByRole('searchbox', { name: /search threads/i })).toBeInTheDocument();
+  });
+
+  it('navigates to the results page on submit', async () => {
+    renderHeader({ token: 'test-token', user: { name: 'Alice' } });
+    await userEvent.type(screen.getByRole('searchbox'), 'react');
+    await userEvent.click(screen.getByRole('button', { name: /^search$/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/search?q=react');
+  });
+
+  it('does not navigate when the query is blank', async () => {
+    renderHeader({ token: 'test-token', user: { name: 'Alice' } });
+    await userEvent.type(screen.getByRole('searchbox'), '   ');
+    await userEvent.click(screen.getByRole('button', { name: /^search$/i }));
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it('calls onToggleDarkMode when dark mode button is clicked', async () => {
     const store = configureStore({
       reducer: {

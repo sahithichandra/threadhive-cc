@@ -212,6 +212,20 @@ export const handlers = [
     return HttpResponse.json({ data: newSubreddit }, { status: 201 });
   }),
 
+  // Search endpoint
+  http.get(`${BASE_URL}/search/threads`, ({ request }) => {
+    const url = new URL(request.url);
+    const q = (url.searchParams.get('q') || '').trim().toLowerCase();
+    const results = q
+      ? mockThreads.filter(
+          (t) =>
+            t.title.toLowerCase().includes(q) ||
+            t.content.toLowerCase().includes(q)
+        )
+      : [];
+    return HttpResponse.json({ data: results });
+  }),
+
   // Bookmark endpoints
   http.get(`${BASE_URL}/bookmarks`, () => {
     return HttpResponse.json({ data: [] });

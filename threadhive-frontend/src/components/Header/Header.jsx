@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navbar, Container, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +35,16 @@ function Header({ onToggleSidebar }) {
     dispatch(toggleDarkMode());
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      navigate(`/search?q=${encodeURIComponent(q)}`);
+    }
+  };
+
   return (
     <Navbar className="header-navbar shadow-sm">
       <Container fluid className="header-container d-flex justify-content-between align-items-center">
@@ -51,6 +62,21 @@ function Header({ onToggleSidebar }) {
             ThreadHive
           </h1>
         </div>
+        {token && (
+          <form className="header-search" role="search" onSubmit={handleSearchSubmit}>
+            <input
+              type="search"
+              className="header-search-input"
+              placeholder="Search threads..."
+              aria-label="Search threads"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="header-search-btn" aria-label="Search">
+              🔍
+            </button>
+          </form>
+        )}
         <div className="d-flex align-items-center">
           <button
             className="dark-mode-toggle"
