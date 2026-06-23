@@ -6,6 +6,7 @@ import commentReducer from '../reducers/commentSlice';
 import themeReducer from '../reducers/themeSlice';
 import subredditReducer from '../reducers/subredditSlice';
 import bookmarkReducer from '../reducers/bookmarkSlice';
+import searchReducer from '../reducers/searchSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     theme: themeReducer,                // dark mode theme
     subreddits: subredditReducer,       // all subreddits
     bookmarks: bookmarkReducer,         // current user's saved threads
+    search: searchReducer,              // thread search results
   },
 });

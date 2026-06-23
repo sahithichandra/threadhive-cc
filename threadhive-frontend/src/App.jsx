@@ -9,6 +9,7 @@ import Register from './pages/Auth/Register';
 import Home from './pages/User/Home';
 import ThreadPage from './pages/User/ThreadPage';
 import Profile from './pages/User/Profile';
+import SearchResults from './pages/User/SearchResults';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import './App.css';
 
@@ -77,6 +78,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Profile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <PrivateRoute>
+                    <SearchResults />
                   </PrivateRoute>
                 }
               />
