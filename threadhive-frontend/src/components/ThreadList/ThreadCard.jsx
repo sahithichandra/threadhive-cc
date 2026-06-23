@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { upvoteThreadThunk, downvoteThreadThunk, generateSummaryThunk } from '../../reducers/threadSlice';
 import { Card, Button, Row, Col, Stack } from "react-bootstrap";
 import VoteButtons from '../Shared/VoteButtons';
+import SaveButton from '../Shared/SaveButton';
 import ThreadSummary from './ThreadSummary';
 import './ThreadCard.css';
 
@@ -58,6 +59,7 @@ export default function ThreadCard({ thread, goBack }) {
                 onUpvote={handleUpvote}
                 onDownvote={handleDownvote}
               />
+              <SaveButton threadId={thread._id} />
             </Stack>
           </Col>
 

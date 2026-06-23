@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Provider } from "react-redux";
@@ -8,16 +8,19 @@ import { configureStore } from "@reduxjs/toolkit";
 import ThreadCard from "../../../src/components/ThreadList/ThreadCard";
 import threadReducer from "../../../src/reducers/threadSlice";
 import currentThreadReducer from "../../../src/reducers/selectedThreadSlice";
+import bookmarkReducer from "../../../src/reducers/bookmarkSlice";
 
-const createMockStore = (threads = []) => {
+const createMockStore = (threads = [], savedIds = []) => {
   return configureStore({
     reducer: {
       threads: threadReducer,
       currentThread: currentThreadReducer,
+      bookmarks: bookmarkReducer,
     },
     preloadedState: {
       threads: { threads, loading: false, error: null },
       currentThread: { thread: null, loading: false, error: null },
+      bookmarks: { savedThreads: [], savedIds, loading: false, error: null },
     },
   });
 };
@@ -135,5 +138,38 @@ describe("ThreadCard Component", () => {
       </Provider>,
     );
     expect(screen.getByText(/no thread found/i)).toBeInTheDocument();
+  });
+
+  it("shows an unsaved (Save) bookmark button by default", () => {
+    renderThreadCard();
+    expect(
+      screen.getByRole("button", { name: /save thread/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a saved (Unsave) bookmark button when the thread is in savedIds", () => {
+    const store = createMockStore([mockThread], [mockThread._id]);
+    render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <ThreadCard thread={mockThread} goBack={mockGoBack} />
+        </BrowserRouter>
+      </Provider>,
+    );
+    expect(
+      screen.getByRole("button", { name: /unsave thread/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("toggles to saved when the bookmark button is clicked", async () => {
+    renderThreadCard();
+    await userEvent.click(
+      screen.getByRole("button", { name: /save thread/i }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: /unsave thread/i }),
+      ).toBeInTheDocument(),
+    );
   });
 });

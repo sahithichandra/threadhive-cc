@@ -26,6 +26,13 @@ export const COMMENT_API = {
   DOWNVOTE: (id) => `/comments/${id}/downvote`,
 };
 
+// Bookmark API Endpoints
+export const BOOKMARK_API = {
+  GET_ALL: "/bookmarks",
+  SAVE: (threadId) => `/bookmarks/${threadId}`,
+  UNSAVE: (threadId) => `/bookmarks/${threadId}`,
+};
+
 // Subreddit API Endpoints
 export const SUBREDDIT_API = {
   GET_ALL: "/subreddits",

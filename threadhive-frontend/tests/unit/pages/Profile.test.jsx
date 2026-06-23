@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import Profile from '../../../src/pages/User/Profile';
-import authReducer from '../../../src/reducers/authSlice';
+import bookmarkReducer from '../../../src/reducers/bookmarkSlice';
+import { server } from '../../mocks/server';
+
+const BASE_URL = 'http://localhost:3000/api';
 
 const mockNavigate = vi.fn();
 
@@ -26,6 +30,7 @@ const createMockStore = (user) => {
         loading: false,
         error: null,
       }),
+      bookmarks: bookmarkReducer,
     },
   });
 };
@@ -204,5 +209,45 @@ describe('Profile', () => {
     expect(screen.getByPlaceholderText(/Tell us about yourself/)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/City, Country/)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/https:\/\//)).toBeInTheDocument();
+  });
+
+  it('shows the empty state on the Bookmarks tab when nothing is saved', async () => {
+    const user = userEvent.setup();
+    const store = createMockStore({ name: 'Test User' });
+    renderWithProviders(store);
+
+    await user.click(screen.getByText(/Bookmarks/));
+
+    await waitFor(() =>
+      expect(screen.getByText(/haven't saved any threads/i)).toBeInTheDocument()
+    );
+  });
+
+  it('lists saved threads on the Bookmarks tab', async () => {
+    server.use(
+      http.get(`${BASE_URL}/bookmarks`, () =>
+        HttpResponse.json({
+          data: [
+            {
+              _id: 'saved-1',
+              title: 'My Saved Thread',
+              content: 'Saved content',
+              subreddit: { _id: 's1', name: 'react' },
+              voteCount: 1,
+            },
+          ],
+        })
+      )
+    );
+
+    const user = userEvent.setup();
+    const store = createMockStore({ name: 'Test User' });
+    renderWithProviders(store);
+
+    await user.click(screen.getByText(/Bookmarks/));
+
+    await waitFor(() =>
+      expect(screen.getByText('My Saved Thread')).toBeInTheDocument()
+    );
   });
 });

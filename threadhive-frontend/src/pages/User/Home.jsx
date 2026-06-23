@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { fetchThreads } from '../../reducers/threadSlice';
+import { fetchBookmarksThunk } from '../../reducers/bookmarkSlice';
 import RightSidebar from '../../components/RightSidebar/RightSidebar';
 import CreateThreadForm from '../../components/Forms/CreateThreadForm';
 import FilterSortBar from '../../components/Shared/FilterSortBar';
@@ -25,6 +26,11 @@ export default function Home() {
   const itemsPerPage = 5;
 
   const { threads, loading, error } = useSelector((state) => state.threads);
+
+  // Hydrate the user's saved-thread ids once so feed cards show saved state.
+  useEffect(() => {
+    dispatch(fetchBookmarksThunk());
+  }, [dispatch]);
 
   // Load initial threads or subreddit-specific threads
   useEffect(() => {

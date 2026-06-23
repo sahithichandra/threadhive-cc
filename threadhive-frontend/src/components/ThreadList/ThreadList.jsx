@@ -3,6 +3,7 @@ import { upvoteThreadThunk, downvoteThreadThunk } from '../../reducers/threadSli
 import { Link } from 'react-router-dom';
 import { Container } from "react-bootstrap";
 import VoteButtons from '../Shared/VoteButtons';
+import SaveButton from '../Shared/SaveButton';
 import './ThreadList.css';
 
 export default function ThreadList({ threadsToDisplay }) {
@@ -37,6 +38,7 @@ export default function ThreadList({ threadsToDisplay }) {
                 <span className="subreddit-badge">
                   r/{thread.subreddit?.name || 'unknown'}
                 </span>
+                <SaveButton threadId={thread._id} />
               </div>
               <p className="thread-text">{thread.content}</p>
               <Link

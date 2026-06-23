@@ -11,6 +11,7 @@ describe("Redux Store Configuration", () => {
     expect(state).toHaveProperty("comments");
     expect(state).toHaveProperty("theme");
     expect(state).toHaveProperty("subreddits");
+    expect(state).toHaveProperty("bookmarks");
   });
 
   it("should initialize auth state correctly", () => {
@@ -63,5 +64,16 @@ describe("Redux Store Configuration", () => {
     expect(state.subreddits).toHaveProperty("loading");
     expect(state.subreddits).toHaveProperty("error");
     expect(Array.isArray(state.subreddits.subreddits)).toBe(true);
+  });
+
+  it("should initialize bookmarks state correctly", () => {
+    const state = store.getState();
+
+    expect(state.bookmarks).toHaveProperty("savedThreads");
+    expect(state.bookmarks).toHaveProperty("savedIds");
+    expect(state.bookmarks).toHaveProperty("loading");
+    expect(state.bookmarks).toHaveProperty("error");
+    expect(Array.isArray(state.bookmarks.savedThreads)).toBe(true);
+    expect(Array.isArray(state.bookmarks.savedIds)).toBe(true);
   });
 });
